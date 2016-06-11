@@ -12,7 +12,7 @@ defmodule Todo.Cache do
         {:reply, todo_server, todo_servers}
 
       :error ->
-        new_server = Todo.Server.start
+        new_server = Todo.Server.start(todo_list_name)
 
       {
         :reply,

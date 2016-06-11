@@ -1,28 +1,31 @@
 defmodule Todo.Server do
   use GenServer
 
-  def init(_) do
-    {:ok, Todo.List.new}
+  def init(name) do
+    #{:ok, {Todo.List.new, name}}
+    {:ok, {Todo.Database.get(name) || Todo.List.new, name}}
   end
 
   #callback functions invoked in the server process
-  def handle_cast({:add_entry, new_entry}, state) do
-    {:noreply, Todo.List.add_entry(state, new_entry)}
+  def handle_cast({:add_entry, new_entry}, {list, name}) do
+    new_state = Todo.List.add_entry(list, new_entry)
+    #Todo.Database.store(name, new_state)
+    {:noreply, {new_state, name}}
   end
-  def handle_cast({:delete_entry, entry_id}, state) do
-    {:noreply, Todo.List.delete_entry(state, entry_id)}
+  def handle_cast({:delete_entry, entry_id}, {list, name}) do
+    {:noreply, {Todo.List.delete_entry(list, entry_id), name}}
   end
-  def handle_cast({:update_entry, entry}, state) do
-    {:noreply, Todo.List.update_entry(state, entry)}
+  def handle_cast({:update_entry, entry}, {list, name}) do
+    {:noreply, {Todo.List.update_entry(list, entry), name}}
   end
 
-  def handle_call({:entries, date}, _, state) do
-    {:reply, Todo.List.entries(state, date), state}
+  def handle_call({:entries, date}, _, {list, name}) do
+    {:reply, Todo.List.entries(list, date), {list, name}}
   end
 
   #interface functions
-  def start do
-    GenServer.start(Todo.Server, nil)
+  def start(name) do
+    GenServer.start(__MODULE__, name)
   end
 
   def add_entry(pid, new_entry) do
