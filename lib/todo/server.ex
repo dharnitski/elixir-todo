@@ -1,50 +1,43 @@
 defmodule Todo.Server do
+  use GenServer
+
+  def init(_) do
+    {:ok, Todo.List.new}
+  end
+
+  #callback functions invoked in the server process
+  def handle_cast({:add_entry, new_entry}, state) do
+    {:noreply, Todo.List.add_entry(state, new_entry)}
+  end
+  def handle_cast({:delete_entry, entry_id}, state) do
+    {:noreply, Todo.List.delete_entry(state, entry_id)}
+  end
+  def handle_cast({:update_entry, entry}, state) do
+    {:noreply, Todo.List.update_entry(state, entry)}
+  end
+
+  def handle_call({:entries, date}, _, state) do
+    {:reply, Todo.List.entries(state, date), state}
+  end
+
+  #interface functions
   def start do
-    spawn (fn -> loop(Todo.List.new) end)
+    GenServer.start(Todo.Server, nil)
   end
 
-  def add_entry(todo_server, new_entry) do
-    send(todo_server, {:add_entry, new_entry})
+  def add_entry(pid, new_entry) do
+    GenServer.cast(pid, {:add_entry, new_entry})
   end
 
-  def delete_entry(todo_server, entry_id) do
-    send(todo_server, {:delete_entry, entry_id})
+  def delete_entry(pid, entry_id) do
+    GenServer.cast(pid, {:delete_entry, entry_id})
   end
 
-  def update_entry(todo_server, %{} = new_entry) do
-    send(todo_server, {:update_entry, new_entry})
+  def update_entry(pid, %{} = new_entry) do
+    GenServer.cast(pid, {:update_entry, new_entry})
   end
 
-  def entries(todo_server, date) do
-    send(todo_server, {:entries, self, date})
-
-    receive do
-      {:todo_entries, entries} -> entries
-    after 5000 ->
-      {:error, :timeout}
-    end
+  def entries(pid, date) do
+    GenServer.call(pid, {:entries, date})
   end
-
-  defp loop(todo_list) do
-    new_todo_list = receive do
-      message -> process_message(todo_list, message)
-    end
-
-    loop(new_todo_list)
-  end
-
-  defp process_message(todo_list, {:add_entry, new_entry}) do
-    Todo.List.add_entry(todo_list, new_entry)
-  end
-  defp process_message(todo_list, {:delete_entry, entry_id}) do
-    Todo.List.delete_entry(todo_list, entry_id)
-  end
-  defp process_message(todo_list, {:update_entry, entry}) do
-    Todo.List.update_entry(todo_list, entry)
-  end
-  defp process_message(todo_list, {:entries, caller, date}) do
-    send(caller, {:todo_entries, Todo.List.entries(todo_list, date)})
-    todo_list
-  end
-
 end

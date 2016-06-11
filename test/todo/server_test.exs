@@ -2,7 +2,7 @@ defmodule InAction.Todo.ServerTest do
   use ExUnit.Case
 
   test "Add Entry" do
-    todo_server = Todo.Server.start
+    {:ok, todo_server} = Todo.Server.start
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Dentist"})
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 20}, title: "Shopping"})
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Movies"})
@@ -14,7 +14,7 @@ defmodule InAction.Todo.ServerTest do
   end
 
   test "Delete Entry" do
-    todo_server = Todo.Server.start
+    {:ok, todo_server} = Todo.Server.start
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Dentist"})
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Movies"})
     Todo.Server.delete_entry(todo_server, 2)
@@ -25,7 +25,7 @@ defmodule InAction.Todo.ServerTest do
   end
 
   test "Update Entry" do
-    todo_server = Todo.Server.start
+    {:ok, todo_server} = Todo.Server.start
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Dentist"})
     Todo.Server.update_entry(todo_server, %{date: {2013, 12, 20}, id: 1, title: "Movie"})
     assert Todo.Server.entries(todo_server, {2013, 12, 20}) ==

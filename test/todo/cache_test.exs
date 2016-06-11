@@ -13,10 +13,10 @@ defmodule Todo.Cache.Test do
 
   test "Use cache for ToDo list" do
     {:ok, cache} = Todo.Cache.start
-    bobs_list = Todo.Cache.server_process(cache, "Bob's list")
+    {:ok, bobs_list} = Todo.Cache.server_process(cache, "Bob's list")
     Todo.Server.add_entry(bobs_list, %{date: {2013, 12, 19}, title: "Dentist"})
     assert Todo.Server.entries(bobs_list, {2013, 12, 19}) ==
-      [%{date: {2013, 12, 19}, id: 1, title: "Dentist"}] 
+      [%{date: {2013, 12, 19}, id: 1, title: "Dentist"}]
   end
 
 end
