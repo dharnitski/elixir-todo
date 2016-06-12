@@ -2,19 +2,28 @@ defmodule InAction.Todo.ServerTest do
   use ExUnit.Case, async: false
 
   setup do
-      :meck.new(Todo.Database, [:no_link])
-      :meck.expect(Todo.Database, :get, fn(_) -> nil end)
-      :meck.expect(Todo.Database, :store, fn(_, _) -> :ok end)
+    cleanup
+    Todo.Database.start("./persist/")
+    #:meck.new(Todo.Database, [:no_link])
+    #:meck.expect(Todo.Database, :get, fn(_) -> nil end)
+    #:meck.expect(Todo.Database, :store, fn(_, _) -> :ok end)
 
-      #{:ok, todo_server} = Todo.Server.start("test_list")
+    on_exit(fn ->
+      cleanup
+      #:meck.unload(Todo.Database)
+    end)
 
-      on_exit(fn ->
-        :meck.unload(Todo.Database)
-        #send(todo_server, :stop)
-      end)
+    :ok
+  end
 
-      :ok
+  defp cleanup do
+    case GenServer.whereis(:database_server) do
+      nil -> :ok
+      pid ->
+        GenServer.stop(pid)
     end
+    File.rm_rf("./persist/")
+  end
 
   test "Add Entry" do
     {:ok, todo_server} = Todo.Server.start("test")
@@ -46,6 +55,16 @@ defmodule InAction.Todo.ServerTest do
     assert Todo.Server.entries(todo_server, {2013, 12, 20}) ==
     [
       %{date: {2013, 12, 20}, id: 1, title: "Movie"},
+    ]
+  end
+
+  test "Persistence" do
+    {:ok, todo_server1} = Todo.Server.start("test")
+    Todo.Server.add_entry(todo_server1, %{date: {2013, 12, 19}, title: "Dentist"})
+    {:ok, todo_server2} = Todo.Server.start("test")
+    assert Todo.Server.entries(todo_server2, {2013, 12, 19}) ==
+    [
+      %{date: {2013, 12, 19}, id: 1, title: "Dentist"}
     ]
   end
 end

@@ -2,14 +2,13 @@ defmodule Todo.Server do
   use GenServer
 
   def init(name) do
-    #{:ok, {Todo.List.new, name}}
     {:ok, {Todo.Database.get(name) || Todo.List.new, name}}
   end
 
   #callback functions invoked in the server process
   def handle_cast({:add_entry, new_entry}, {list, name}) do
     new_state = Todo.List.add_entry(list, new_entry)
-    #Todo.Database.store(name, new_state)
+    Todo.Database.store(name, new_state)
     {:noreply, {new_state, name}}
   end
   def handle_cast({:delete_entry, entry_id}, {list, name}) do
