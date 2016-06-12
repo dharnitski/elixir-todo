@@ -14,7 +14,6 @@ defmodule Todo.Database.Test do
     data = Todo.Database.get("test_key")
     assert 1 == data, "read the data from datatabase"
 
-    #cleanup
     cleanup
   end
 
