@@ -1,16 +1,12 @@
-defmodule InAction.Todo.ServerTest do
+defmodule Todo.Server.Test do
   use ExUnit.Case, async: false
 
   setup do
     cleanup
     Todo.Database.start("./persist/")
-    #:meck.new(Todo.Database, [:no_link])
-    #:meck.expect(Todo.Database, :get, fn(_) -> nil end)
-    #:meck.expect(Todo.Database, :store, fn(_, _) -> :ok end)
 
     on_exit(fn ->
       cleanup
-      #:meck.unload(Todo.Database)
     end)
 
     :ok

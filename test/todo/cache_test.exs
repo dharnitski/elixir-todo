@@ -12,7 +12,7 @@ defmodule Todo.Cache.Test do
 
   test "Use cache for ToDo list" do
     #clean up state
-    File.rm_rf("./test_persist/")
+    cleanup
 
     {:ok, cache} = Todo.Cache.start
     {:ok, bobs_list} = Todo.Cache.server_process(cache, "Bob's list")
@@ -20,6 +20,15 @@ defmodule Todo.Cache.Test do
     Todo.Server.add_entry(bobs_list, %{date: {2013, 12, 19}, title: "Dentist"})
     assert Todo.Server.entries(bobs_list, {2013, 12, 19}) ==
       [%{date: {2013, 12, 19}, id: 1, title: "Dentist"}]
+  end
+
+  defp cleanup do
+    case GenServer.whereis(:database_server) do
+      nil -> :ok
+      pid ->
+        GenServer.stop(pid)
+    end
+    File.rm_rf("./persist/")
   end
 
 end
