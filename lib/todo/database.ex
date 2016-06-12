@@ -41,13 +41,4 @@ defmodule Todo.Database do
     {:reply, Map.get(workers, worker_key), workers}
   end
 
-  # Needed for testing purposes
-  def handle_info(:stop, workers) do
-    workers
-    |> Map.values
-    |> Enum.each(&send(&1, :stop))
-
-    {:stop, :normal, %{}}
-  end
-  def handle_info(_, state), do: {:noreply, state}
 end
