@@ -19,7 +19,7 @@ defmodule Todo.Server.Mocked.Test do
       Todo.List.new
       |> Todo.List.add_entry(%{date: {2013, 12, 19}, title: "Dentist"}) end)
 
-    {:ok, todo_server} = Todo.Server.start("get_test")
+    {:ok, todo_server} = Todo.Server.start_link("get_test")
     assert Todo.Server.entries(todo_server, {2013, 12, 19}) ==
     [
       %{date: {2013, 12, 19}, id: 1, title: "Dentist"},
@@ -27,13 +27,13 @@ defmodule Todo.Server.Mocked.Test do
   end
 
   test "Add Entry should store data in db" do
-    {:ok, todo_server} = Todo.Server.start("test")
+    {:ok, todo_server} = Todo.Server.start_link("test")
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Movies"})
     assert_receive :called!, 10
   end
 
   test "Add Entry" do
-    {:ok, todo_server} = Todo.Server.start("test")
+    {:ok, todo_server} = Todo.Server.start_link("test")
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Dentist"})
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 20}, title: "Shopping"})
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Movies"})
@@ -45,7 +45,7 @@ defmodule Todo.Server.Mocked.Test do
   end
 
   test "Delete Entry" do
-    {:ok, todo_server} = Todo.Server.start("test")
+    {:ok, todo_server} = Todo.Server.start_link("test")
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Dentist"})
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Movies"})
     Todo.Server.delete_entry(todo_server, 2)
@@ -56,7 +56,7 @@ defmodule Todo.Server.Mocked.Test do
   end
 
   test "Update Entry" do
-    {:ok, todo_server} = Todo.Server.start("test")
+    {:ok, todo_server} = Todo.Server.start_link("test")
     Todo.Server.add_entry(todo_server, %{date: {2013, 12, 19}, title: "Dentist"})
     Todo.Server.update_entry(todo_server, %{date: {2013, 12, 20}, id: 1, title: "Movie"})
     assert Todo.Server.entries(todo_server, {2013, 12, 20}) ==

@@ -10,7 +10,7 @@ defmodule Todo.Cache.Test do
   end
 
   test "Cache" do
-    {:ok, _} = Todo.Cache.start
+    {:ok, _} = Todo.Cache.start_link
     bobs1 = Todo.Cache.server_process("Bob's list")
     bobs2 = Todo.Cache.server_process("Bob's list")
     alice1 = Todo.Cache.server_process("Alice's list")
@@ -22,7 +22,7 @@ defmodule Todo.Cache.Test do
     #clean up state
     cleanup
 
-    {:ok, _} = Todo.Cache.start
+    {:ok, _} = Todo.Cache.start_link
     {:ok, bobs_list} = Todo.Cache.server_process("Bob's list")
     assert Todo.Server.entries(bobs_list, {2013, 12, 19}) == []
     Todo.Server.add_entry(bobs_list, %{date: {2013, 12, 19}, title: "Dentist"})

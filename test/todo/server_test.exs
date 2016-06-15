@@ -3,7 +3,7 @@ defmodule Todo.Server.Test do
 
   setup do
     cleanup
-    Todo.Database.start("./persist/")
+    Todo.Database.start_link("./persist/")
 
     on_exit(fn ->
       cleanup
@@ -22,10 +22,10 @@ defmodule Todo.Server.Test do
   end
 
   test "Persistence" do
-    {:ok, todo_server1} = Todo.Server.start("test")
+    {:ok, todo_server1} = Todo.Server.start_link("test")
     assert [] == Todo.Server.entries(todo_server1, {2013, 12, 20})
     Todo.Server.add_entry(todo_server1, %{date: {2013, 12, 19}, title: "Dentist"})
-    {:ok, todo_server2} = Todo.Server.start("test")
+    {:ok, todo_server2} = Todo.Server.start_link("test")
     assert Todo.Server.entries(todo_server2, {2013, 12, 19}) ==
     [
       %{date: {2013, 12, 19}, id: 1, title: "Dentist"}

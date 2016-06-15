@@ -3,7 +3,7 @@ defmodule Todo.Database.Test do
 
   test "Persistence" do
     cleanup
-    Todo.Database.start("./test_persist")
+    Todo.Database.start_link("./test_persist")
 
     data = Todo.Database.get("test_key")
     assert(nil == data, "check initial DB state")
