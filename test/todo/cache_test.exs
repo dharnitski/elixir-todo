@@ -7,6 +7,19 @@ defmodule Todo.Cache.Test do
       pid ->
         GenServer.stop(pid)
     end
+
+    Todo.Database.start_link("./persist/")
+
+    on_exit(fn ->
+      case GenServer.whereis(:database_server) do
+        nil -> :ok
+        pid ->
+          GenServer.stop(pid)
+      end
+      File.rm_rf("./persist/")
+    end)
+
+    :ok
   end
 
   test "Cache" do
@@ -20,7 +33,7 @@ defmodule Todo.Cache.Test do
 
   test "Use cache for ToDo list" do
     #clean up state
-    cleanup
+    #cleanup
 
     {:ok, _} = Todo.Cache.start_link
     {:ok, bobs_list} = Todo.Cache.server_process("Bob's list")
