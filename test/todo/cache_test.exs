@@ -2,6 +2,7 @@ defmodule Todo.Cache.Test do
   use ExUnit.Case, async: false
 
   setup do
+    {:ok, pid1} = Todo.ProcessRegistry.start_link()
     case GenServer.whereis(:todo_cache) do
       nil -> :ok
       pid ->
@@ -11,11 +12,7 @@ defmodule Todo.Cache.Test do
     Todo.Database.start_link("./persist/")
 
     on_exit(fn ->
-      case GenServer.whereis(:database_server) do
-        nil -> :ok
-        pid ->
-          GenServer.stop(pid)
-      end
+      Process.exit(pid1, :kill)
       File.rm_rf("./persist/")
     end)
 
@@ -32,24 +29,12 @@ defmodule Todo.Cache.Test do
   end
 
   test "Use cache for ToDo list" do
-    #clean up state
-    #cleanup
-
     {:ok, _} = Todo.Cache.start_link
     {:ok, bobs_list} = Todo.Cache.server_process("Bob's list")
     assert Todo.Server.entries(bobs_list, {2013, 12, 19}) == []
     Todo.Server.add_entry(bobs_list, %{date: {2013, 12, 19}, title: "Dentist"})
     assert Todo.Server.entries(bobs_list, {2013, 12, 19}) ==
       [%{date: {2013, 12, 19}, id: 1, title: "Dentist"}]
-  end
-
-  defp cleanup do
-    case GenServer.whereis(:database_server) do
-      nil -> :ok
-      pid ->
-        GenServer.stop(pid)
-    end
-    File.rm_rf("./persist/")
   end
 
 end

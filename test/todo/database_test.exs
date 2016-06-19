@@ -1,9 +1,19 @@
 defmodule Todo.Database.Test do
   use ExUnit.Case, async: false
 
+  setup do
+    {:ok, pid} = Todo.ProcessRegistry.start_link()
+
+    on_exit(fn ->
+      Process.exit(pid, :kill)
+      File.rm_rf("./persist/")
+    end)
+
+    :ok
+  end
+
   test "Persistence" do
-    cleanup
-    Todo.Database.start_link("./test_persist")
+    Todo.Database.start_link("./persist")
 
     data = Todo.Database.get("test_key")
     assert(nil == data, "check initial DB state")
@@ -13,17 +23,6 @@ defmodule Todo.Database.Test do
 
     data = Todo.Database.get("test_key")
     assert 1 == data, "read the data from datatabase"
-
-    cleanup
-  end
-
-  defp cleanup do
-    case GenServer.whereis(:database_server) do
-      nil -> :ok
-      pid ->
-        GenServer.stop(pid)
-    end
-    File.rm_rf("./test_persist/")
   end
 
 end

@@ -2,23 +2,16 @@ defmodule Todo.Server.Test do
   use ExUnit.Case, async: false
 
   setup do
-    cleanup
-    Todo.Database.start_link("./persist/")
+    {:ok, pid1} = Todo.ProcessRegistry.start_link()
+    {:ok, pid2} = Todo.Database.start_link("./persist/")
 
     on_exit(fn ->
-      cleanup
+      Process.exit(pid1, :kill)
+      Process.exit(pid2, :kill)
+      File.rm_rf("./persist/")
     end)
 
     :ok
-  end
-
-  defp cleanup do
-    case GenServer.whereis(:database_server) do
-      nil -> :ok
-      pid ->
-        GenServer.stop(pid)
-    end
-    File.rm_rf("./persist/test")
   end
 
   test "Persistence" do

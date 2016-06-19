@@ -30,7 +30,6 @@ defmodule Todo.ProcessRegistry do
 
   #:via
   def start_link do
-    IO.puts "Starting process registry"
     GenServer.start_link(__MODULE__, nil, name: :process_registry)
   end
 
@@ -45,7 +44,6 @@ defmodule Todo.ProcessRegistry do
   def unregister_name(key) do
     GenServer.call(:process_registry, {:unregister_name, key})
   end
-
 
   def send(key, message) do
     case whereis_name(key) do

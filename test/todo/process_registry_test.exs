@@ -1,5 +1,5 @@
 defmodule Todo.ProcessRegistry.Test do
-  use ExUnit.Case, async: false
+  use ExUnit.Case
 
   setup do
     case GenServer.whereis(:process_registry) do
@@ -28,6 +28,13 @@ defmodule Todo.ProcessRegistry.Test do
     Todo.ProcessRegistry.unregister_name({:database_worker, 1})
     assert :undefined = Todo.ProcessRegistry.whereis_name({:database_worker, 1})
     assert Process.alive?(pid)
+  end
+
+  test "Double Registration" do
+    {:ok, _} = Todo.ProcessRegistry.start_link
+    :yes = Todo.ProcessRegistry.register_name({:database_worker, 1}, self)
+    :no = Todo.ProcessRegistry.register_name({:database_worker, 1}, self)
+    Todo.ProcessRegistry.unregister_name({:database_worker, 1})
   end
 
 end
