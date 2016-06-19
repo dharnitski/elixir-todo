@@ -5,5 +5,7 @@ otp_release:
   - 18.2.1
 env:
   - MIX_ENV=test
+notifications:
+  webhooks: https://brainjocks.getbadges.io/api/app/webhook/d9890858-3185-41a6-9cef-6bbc1e62bdf4  
 
 script: mix do deps.get, compile, coveralls.travis
