@@ -5,20 +5,16 @@ defmodule Todo.Cache do
     {:ok, Map.new}
   end
 
-  def handle_call({:server_process, todo_list_name}, _, todo_servers) do
-    case Map.fetch(todo_servers, todo_list_name) do
-      {:ok, todo_server} ->
-        {:reply, todo_server, todo_servers}
+  def handle_call({:server_process, todo_list_name}, _, state) do
+    # We need to recheck once again if the server exists.
+    todo_server_pid = case Todo.Server.whereis(todo_list_name) do
+      :undefined ->
+        {:ok, pid} = Todo.ServerSupervisor.start_child(todo_list_name)
+        pid
 
-      :error ->
-        new_server = Todo.Server.start_link(todo_list_name)
-
-      {
-        :reply,
-        new_server,
-        Map.put(todo_servers, todo_list_name, new_server)
-      }
+      pid -> pid
     end
+    {:reply, todo_server_pid, state}
   end
 
   #interface functions
@@ -27,6 +23,12 @@ defmodule Todo.Cache do
   end
 
   def server_process(todo_list_name) do
-    GenServer.call(:todo_cache, {:server_process, todo_list_name})
+    case Todo.Server.whereis(todo_list_name) do
+      :undefined ->
+        # There's no to-do server, so we'll issue request to the cache process.
+        GenServer.call(:todo_cache, {:server_process, todo_list_name})
+
+      pid -> pid
+    end
   end
 end

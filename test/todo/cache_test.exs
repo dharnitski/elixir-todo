@@ -3,6 +3,7 @@ defmodule Todo.Cache.Test do
 
   setup do
     {:ok, pid1} = Todo.ProcessRegistry.start_link()
+    {:ok, server_supervisor} = Todo.ServerSupervisor.start_link()
     case GenServer.whereis(:todo_cache) do
       nil -> :ok
       pid ->
@@ -13,6 +14,7 @@ defmodule Todo.Cache.Test do
 
     on_exit(fn ->
       Process.exit(pid1, :kill)
+      Process.exit(server_supervisor, :kill)
       File.rm_rf("./persist/")
     end)
 
@@ -30,7 +32,7 @@ defmodule Todo.Cache.Test do
 
   test "Use cache for ToDo list" do
     {:ok, _} = Todo.Cache.start_link
-    {:ok, bobs_list} = Todo.Cache.server_process("Bob's list")
+    bobs_list = Todo.Cache.server_process("Bob's list")
     assert Todo.Server.entries(bobs_list, {2013, 12, 19}) == []
     Todo.Server.add_entry(bobs_list, %{date: {2013, 12, 19}, title: "Dentist"})
     assert Todo.Server.entries(bobs_list, {2013, 12, 19}) ==

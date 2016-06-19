@@ -1,8 +1,17 @@
 defmodule Todo.Supervisor.Test do
   use ExUnit.Case
 
+  setup do
+    {:ok, pid} = Todo.Supervisor.start_link
+
+    on_exit(fn ->
+      Process.exit(pid, :kill)
+    end)
+
+    {:ok, [pid: pid]}
+  end
+
   test "Db Worker Recovery" do
-    Todo.Supervisor.start_link
     worker = Todo.ProcessRegistry.whereis_name({:database_worker, 2})
     assert Process.alive?(worker)
     Process.exit(worker, :kill)
@@ -12,6 +21,14 @@ defmodule Todo.Supervisor.Test do
     new_worker = Todo.ProcessRegistry.whereis_name({:database_worker, 2})
     assert Process.alive?(new_worker)
     assert worker != new_worker
+  end
+
+  test "Create Workers and Supervisors", context do
+    worker = Todo.ProcessRegistry.whereis_name({:database_worker, 2})
+    assert Process.alive?(worker)
+    registry = Process.whereis(:process_registry)
+    assert Process.alive?(registry)
+    assert %{active: 4, specs: 4, supervisors: 2, workers: 2} == Supervisor.count_children(context[:pid])
   end
 
 end
