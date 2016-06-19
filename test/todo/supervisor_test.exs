@@ -11,6 +11,7 @@ defmodule Todo.Supervisor.Test do
     :timer.sleep(100)
     new_worker = Todo.ProcessRegistry.whereis_name({:database_worker, 2})
     assert Process.alive?(new_worker)
+    assert worker != new_worker
   end
 
 end

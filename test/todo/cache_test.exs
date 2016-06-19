@@ -1,5 +1,5 @@
 defmodule Todo.Cache.Test do
-  use ExUnit.Case, async: false
+  use ExUnit.Case
 
   setup do
     {:ok, pid1} = Todo.ProcessRegistry.start_link()
