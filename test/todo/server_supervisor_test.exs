@@ -17,7 +17,7 @@ defmodule Todo.ServiceSupervisor.Test do
   end
 
   test "Server Supervisor" do
-    {ok, todo_server1} = Supervisor.start_child(:todo_server_supervisor, ["test_key"])
+    {:ok, todo_server1} = Supervisor.start_child(:todo_server_supervisor, ["test_key"])
     assert [] == Todo.Server.entries(todo_server1, {2013, 12, 20})
     Todo.Server.add_entry(todo_server1, %{date: {2013, 12, 19}, title: "Dentist"})
     assert Todo.Server.entries(todo_server1, {2013, 12, 19}) ==

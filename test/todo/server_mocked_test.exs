@@ -7,7 +7,10 @@ defmodule Todo.Server.Mocked.Test do
     :meck.expect(Todo.Database, :get, fn(_) -> nil end)
     :meck.expect(Todo.Database, :store, fn(_, _) -> send home, :called! end)
 
+    {:ok, pid} = Todo.ProcessRegistry.start_link()
+    
     on_exit(fn ->
+      Process.exit(pid, :kill)
       :meck.unload(Todo.Database)
     end)
 
