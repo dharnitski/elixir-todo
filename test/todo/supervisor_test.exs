@@ -1,3 +1,5 @@
+Code.require_file "test_helper.exs", __DIR__
+
 defmodule Todo.Supervisor.Test do
   use ExUnit.Case
 
@@ -5,7 +7,7 @@ defmodule Todo.Supervisor.Test do
     {:ok, pid} = Todo.Supervisor.start_link
 
     on_exit(fn ->
-      Process.exit(pid, :kill)
+        Todo.TestHelper.cleanup_gen_servers
     end)
 
     {:ok, [pid: pid]}
