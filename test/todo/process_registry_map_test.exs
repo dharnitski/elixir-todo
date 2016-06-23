@@ -30,6 +30,20 @@ defmodule Todo.ProcessRegistry.Map.Test do
     assert Process.alive?(pid)
   end
 
+  test "Unregistration of Terminated process" do
+    {:ok, _} = Todo.ProcessRegistry.Map.start_link
+    {:ok, worker} = GenServer.Mock.start
+    :yes = Todo.ProcessRegistry.Map.register_name({:database_worker, 1}, worker)
+    pid = Todo.ProcessRegistry.Map.whereis_name({:database_worker, 1})
+    assert Process.alive?(pid)
+    assert pid == worker
+    Process.exit(pid, :kill)
+    assert Process.alive?(pid) == false
+    # give some time to supervisor to restart worker
+    :timer.sleep(100)
+    :undefined = Todo.ProcessRegistry.Map.whereis_name({:database_worker, 1})
+  end
+
   test "Double Registration" do
     {:ok, _} = Todo.ProcessRegistry.Map.start_link
     :yes = Todo.ProcessRegistry.Map.register_name({:database_worker, 1}, self)
@@ -37,4 +51,17 @@ defmodule Todo.ProcessRegistry.Map.Test do
     Todo.ProcessRegistry.Map.unregister_name({:database_worker, 1})
   end
 
+end
+
+defmodule GenServer.Mock do
+  use GenServer
+
+  def init(_) do
+    {:ok, nil}
+  end
+
+  #interface functions
+  def start do
+    GenServer.start(__MODULE__, nil)
+  end
 end
