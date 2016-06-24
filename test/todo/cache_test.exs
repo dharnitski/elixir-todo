@@ -2,7 +2,7 @@ defmodule Todo.Cache.Test do
   use ExUnit.Case
 
   setup do
-    {:ok, pid1} = Todo.ProcessRegistry.start_link()
+    #{:ok, pid1} = Todo.ProcessRegistry.start_link()
     {:ok, server_supervisor} = Todo.ServerSupervisor.start_link()
     case GenServer.whereis(:todo_cache) do
       nil -> :ok
@@ -13,7 +13,7 @@ defmodule Todo.Cache.Test do
     Todo.Database.start_link("./persist/")
 
     on_exit(fn ->
-      Process.exit(pid1, :kill)
+      #Process.exit(pid1, :kill)
       Process.exit(server_supervisor, :kill)
       File.rm_rf("./persist/")
     end)
