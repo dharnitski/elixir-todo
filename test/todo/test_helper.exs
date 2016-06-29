@@ -1,7 +1,7 @@
 defmodule Todo.TestHelper do
 
   def cleanup_gen_servers do
-    for name <- [:todo_cache, :process_registry, :todo_server_supervisor] do
+    for name <- [:todo_cache, :process_registry] do
       case GenServer.whereis(name) do
         nil -> :ok
         pid ->

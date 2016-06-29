@@ -17,10 +17,8 @@ defmodule Todo.Mixfile do
   #
   # Type "mix help compile.app" for more information
   def application do
-    [
-      applications: [:logger, :gproc],
-      #mod: {Todo.Application, []}
-    ]
+    rest = if(Mix.env == :test, do: [], else: [mod: {Todo.Application, []}])
+    [applications: [:logger, :gproc]] ++ rest
   end
 
   # Dependencies can be Hex packages:
