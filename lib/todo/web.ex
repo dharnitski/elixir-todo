@@ -29,10 +29,35 @@ defmodule Todo.Web do
     Plug.Conn.assign(conn, :response, "OK")
   end
 
-
   # curl 'http://localhost:5454/entries?list=bob&date=20131219'
   get "/entries" do
-    "hello"
+    conn
+    |> Plug.Conn.fetch_query_params
+    |> fetch_entries
+    |> respond
+  end
+
+  defp fetch_entries(conn) do
+    Plug.Conn.assign(
+      conn,
+      :response,
+      entries(conn.params["list"], parse_date(conn.params["date"]))
+    )
+  end
+
+  defp entries(list_name, date) do
+    list_name
+    |> Todo.Cache.server_process
+    |> Todo.Server.entries(date)
+    |> format_entries
+  end
+
+  defp format_entries(entries) do
+    for entry <- entries do
+      {y,m,d} = entry.date
+      "#{y}-#{m}-#{d}    #{entry.title}"
+    end
+    |> Enum.join("\n")
   end
 
   defp respond(conn) do
