@@ -8,10 +8,6 @@ defmodule Todo.Web do
     Plug.Adapters.Cowboy.http(__MODULE__, nil, port: 5454)
   end
 
-  def init(_) do
-    :ok
-  end
-
   # curl -d '' 'http://localhost:5454/add_entry?list=bob&date=20131219&title=Dentist'
   post "/add_entry" do
     conn
