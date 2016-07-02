@@ -1,5 +1,5 @@
 defmodule Todo.Server.Mocked.Test do
-  use ExUnit.Case, async: false
+  use ExUnit.Case
 
   setup do
     home = self
@@ -8,7 +8,7 @@ defmodule Todo.Server.Mocked.Test do
     :meck.expect(Todo.Database, :store, fn(_, _) -> send home, :called! end)
 
     {:ok, pid} = Todo.ProcessRegistry.start_link()
-    
+
     on_exit(fn ->
       Process.exit(pid, :kill)
       :meck.unload(Todo.Database)

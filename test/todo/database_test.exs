@@ -1,5 +1,5 @@
 defmodule Todo.Database.Test do
-  use ExUnit.Case, async: false
+  use ExUnit.Case
 
   setup do
     {:ok, pid} = Todo.ProcessRegistry.start_link()

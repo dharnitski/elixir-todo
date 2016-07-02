@@ -5,7 +5,11 @@ defmodule Todo.Web do
   plug :dispatch
 
   def start_server do
-    Plug.Adapters.Cowboy.http(__MODULE__, nil, port: 5454)
+    case Application.get_env(:todo, :port) do
+      nil -> raise("Todo port not specified!")
+      port ->
+        Plug.Adapters.Cowboy.http(__MODULE__, nil, port: port)
+    end
   end
 
   # curl -d '' 'http://localhost:5454/add_entry?list=bob&date=20131219&title=Dentist'
