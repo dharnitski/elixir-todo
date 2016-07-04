@@ -16,7 +16,7 @@ defmodule Todo.Supervisor.Test do
   test "Db Worker Recovery", context do
     worker = :gproc.whereis_name({:n, :l, {:database_worker, 2}})
     assert Process.alive?(worker)
-    assert %{active: 3, specs: 3, supervisors: 2, workers: 1} == Supervisor.count_children(context[:pid])
+    assert %{active: 2, specs: 2, supervisors: 2, workers: 0} == Supervisor.count_children(context[:pid])
 
     Process.exit(worker, :kill)
     assert Process.alive?(worker) == false
