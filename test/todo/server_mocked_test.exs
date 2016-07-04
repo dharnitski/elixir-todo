@@ -5,7 +5,11 @@ defmodule Todo.Server.Mocked.Test do
     home = self
     :meck.new(Todo.Database, [:no_link])
     :meck.expect(Todo.Database, :get, fn(_) -> nil end)
-    :meck.expect(Todo.Database, :store, fn(_, _) -> send home, :called! end)
+    :meck.expect(Todo.Database,
+      :store,
+      fn(_, _) -> send home,
+      :called! end
+    )
 
     {:ok, pid} = Todo.ProcessRegistry.start_link()
 

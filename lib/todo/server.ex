@@ -24,15 +24,20 @@ defmodule Todo.Server do
 
   #interface functions
   def start_link(name) do
-    GenServer.start_link(__MODULE__, name, name: via_tuple(name))
+    #GenServer.start_link(__MODULE__, name, name: via_tuple(name))
+    GenServer.start_link(
+      __MODULE__, name,
+      name: {:global, {:todo_server, name}}
+    )
   end
 
-  defp via_tuple(name) do
-    {:via, :gproc, {:n, :l, {:todo_server, name}}}
-  end
+  #defp via_tuple(name) do
+  #  {:via, :gproc, {:n, :l, {:todo_server, name}}}
+  #end
 
   def whereis(name) do
-    :gproc.whereis_name({:n, :l, {:todo_server, name}})
+    #:gproc.whereis_name({:n, :l, {:todo_server, name}})
+    :global.whereis_name({:todo_server, name})
   end
 
   def add_entry(pid, new_entry) do

@@ -29,6 +29,7 @@ defmodule Todo.Mixfile do
       {:hackney, "1.6.0"},
       {:excoveralls, "~> 0.5", only: :test},
       {:meck, "~> 0.8.2", only: :test},
+      {:mock, "~> 0.1.1", only: :test},
       {:httpoison, "~> 0.9.0", only: :test},
       {:inch_ex, only: :docs}
     ]
