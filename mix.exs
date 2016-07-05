@@ -18,7 +18,7 @@ defmodule Todo.Mixfile do
   # Type "mix help compile.app" for more information
   def application do
     rest = if(Mix.env == :test, do: [], else: [mod: {Todo.Application, []}])
-    [applications: [:logger, :gproc, :cowboy, :plug]] ++ rest
+    [applications: [:logger, :gproc, :cowboy, :plug, :hackney]] ++ rest
   end
 
   defp deps do
@@ -31,7 +31,8 @@ defmodule Todo.Mixfile do
       {:meck, "~> 0.8.2", only: :test},
       {:mock, "~> 0.1.1", only: :test},
       {:httpoison, "~> 0.9.0", only: :test},
-      {:inch_ex, only: :docs}
+      {:inch_ex, "~> 0.5", only: :docs},
+      {:exrm, "1.0.6"}
     ]
   end
 end
